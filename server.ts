@@ -33,7 +33,7 @@ app.use("/api/results", resultRoutes);
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Welcome to ChainVerse Academy");
+  res.send("Welcome to Dewordle Express");
 });
 
 // 404 handler middleware
