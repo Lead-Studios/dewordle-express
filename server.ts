@@ -3,13 +3,14 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import dbConnection from "./src/config/database";
-import { 
-  userRoutes, 
-  authRoutes, 
-  leaderboardRoutes, 
-  adminRoutes, 
-  resultRoutes 
+import {
+  userRoutes,
+  authRoutes,
+  leaderboardRoutes,
+  adminRoutes,
+  resultRoutes,
 } from "./src/routes";
+import subAdminRoutes from "./src/routes/subAdmin.routes";
 
 // Configure dotenv
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/sub-admin", subAdminRoutes);
 app.use("/api/results", resultRoutes);
 
 // Root route
@@ -44,12 +46,19 @@ app.use((req, res, next) => {
 });
 
 // Error handling middleware
-app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.status(res.statusCode || 500).json({
-    message: error.message,
-    stack: process.env.NODE_ENV === 'production' ? '🥞' : error.stack
-  });
-});
+app.use(
+  (
+    error: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    res.status(res.statusCode || 500).json({
+      message: error.message,
+      stack: process.env.NODE_ENV === "production" ? "🥞" : error.stack,
+    });
+  }
+);
 
 // Port configuration
 const PORT = process.env.PORT || 3000;
@@ -58,4 +67,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-
