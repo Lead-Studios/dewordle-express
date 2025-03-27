@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
@@ -17,45 +17,53 @@ dotenv.config();
 // Create express app
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ Connect to Database before setting up middleware
 dbConnection();
+
+// ✅ Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Register routes
+// ✅ Register routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/results", resultRoutes);
 
-// Root route
-app.get("/", (req, res) => {
+// ✅ Root route
+app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Dewordle Express");
 });
 
-// 404 handler middleware
-app.use((req, res, next) => {
-  const error = new Error("Not found");
-  res.status(404);
-  next(error);
+// ✅ 404 Not Found Handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
-// Error handling middleware
-app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.status(res.statusCode || 500).json({
+// ✅ Error Handling Middleware
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  res.status(res.statusCode >= 400 ? res.statusCode : 500).json({
     message: error.message,
-    stack: process.env.NODE_ENV === 'production' ? '🥞' : error.stack
+    stack: process.env.NODE_ENV === "production" ? "🥞" : error.stack,
   });
 });
 
-// Port configuration
+// ✅ Port Configuration
 const PORT = process.env.PORT || 3000;
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+// ✅ Start Server
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
+// ✅ Graceful Shutdown (For Production)
+process.on("SIGINT", () => {
+  console.log("🛑 Server shutting down...");
+  server.close(() => {
+    console.log("🔌 Database disconnected");
+    process.exit(0);
+  });
+});
