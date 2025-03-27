@@ -1,7 +1,9 @@
 import express, { Request, Response } from 'express';
-import { signupValidationSchema, loginValidationSchema } from '../validators/auth.validator';
+import { signupValidationSchema, loginValidationSchema, passwordResetRequestSchema, passwordResetSchema } from '../validators/auth.validator';
+import { ObjectSchema } from 'joi';
 
 const router = express.Router();
+const AuthController = require('../controllers/auth.controller');
 
 // Middleware for signup validation
 const validateSignup = (req: Request, res: Response, next: Function) => {
@@ -60,5 +62,25 @@ router.post('/logout', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error during logout', error: (error as Error).message });
   }
 });
+
+
+// Request password reset endpoint
+router.post(
+  '/request-reset', 
+  validateRequest(passwordResetRequestSchema),
+  AuthController.requestPasswordReset
+);
+
+// Reset password endpoint
+router.post(
+  '/reset-password', 
+  validateRequest(passwordResetSchema),
+  AuthController.resetPassword
+);
+
+
+function validateRequest(passwordResetRequestSchema: ObjectSchema<any>): import("express-serve-static-core").RequestHandler<{}, any, any, import("qs").ParsedQs, Record<string, any>> {
+  throw new Error('Function not implemented.');
+}
 
 export default router; 

@@ -38,3 +38,31 @@ export const loginValidationSchema = Joi.object({
   }),
   password: passwordSchema,
 });
+
+
+// Email validation schema for password reset request
+export const passwordResetRequestSchema = Joi.object({
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org', 'edu'] } })
+    .required()
+    .messages({
+      'string.email': 'Invalid email format',
+      'string.empty': 'Email is required',
+      'any.required': 'Email must be provided'
+    })
+});
+
+// Password reset validation schema
+export const passwordResetSchema = Joi.object({
+  token: Joi.string().required(),
+  newPassword: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
+    .required()
+    .messages({
+      'string.min': 'Password must be at least 8 characters long',
+      'string.max': 'Password cannot exceed 30 characters',
+      'string.pattern.base': 'Password must include uppercase, lowercase, number, and special character'
+    })
+});
